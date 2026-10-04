@@ -1,12 +1,10 @@
 data "aws_caller_identity" "current" {}
 
-# 1. Bucket S3 privado
 resource "aws_s3_bucket" "images_bucket" {
   bucket        = "image-processor-${var.environment}-images-${data.aws_caller_identity.current.account_id}"
   force_destroy = true
 }
 
-# 2. Carpetas virtuales
 resource "aws_s3_object" "uploads_folder" {
   bucket = aws_s3_bucket.images_bucket.id
   key    = "uploads/"
@@ -17,7 +15,6 @@ resource "aws_s3_object" "processed_folder" {
   key    = "processed/"
 }
 
-# 3. DLQ y Cola SQS Principal
 resource "aws_sqs_queue" "image_dlq" {
   name                      = "image-processor-${var.environment}-dlq"
   message_retention_seconds = 1209600
@@ -33,7 +30,6 @@ resource "aws_sqs_queue" "image_queue" {
   })
 }
 
-# 4. Politica de SQS
 resource "aws_sqs_queue_policy" "queue_policy" {
   queue_url = aws_sqs_queue.image_queue.id
   policy = jsonencode({
@@ -52,7 +48,6 @@ resource "aws_sqs_queue_policy" "queue_policy" {
   })
 }
 
-# 5. Notificacion de S3 a SQS
 resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = aws_s3_bucket.images_bucket.id
 
