@@ -1,18 +1,19 @@
-# Local .terraform directories
-**/.terraform/*
+# Terraform
 .terraform/
-
-# .tfstate files
 *.tfstate
 *.tfstate.*
+*.tfplan
 
-# Crash log files
+# Crash logs
 crash.log
 crash.*.log
 
-# IntelliJ folders
+# IntelliJ
 .idea/
 *.iml
 
 # Node.js
 node_modules/
+
+# ZIP generado por Lambda Crop
+crop-lambda.zip
