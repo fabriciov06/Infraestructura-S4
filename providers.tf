@@ -11,3 +11,7 @@ provider "aws" {
   region  = "us-east-1"
   profile = "wlupao"
 }
+
+variable "upload_bucket_name" {
+  type = string
+}
