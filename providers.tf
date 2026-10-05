@@ -17,6 +17,3 @@ provider "aws" {
   profile = "wlupao"
 }
 
-variable "upload_bucket_name" {
-  type = string
-}

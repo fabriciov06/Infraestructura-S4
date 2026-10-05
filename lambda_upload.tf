@@ -35,7 +35,7 @@ resource "aws_iam_policy" "upload_lambda_s3_policy" {
       {
         Effect   = "Allow"
         Action   = ["s3:PutObject"]
-        Resource = "arn:aws:s3:::${var.upload_bucket_name}/uploads/*"
+        Resource = "${aws_s3_bucket.images_bucket.arn}/uploads/*"
       }
     ]
   })
@@ -58,7 +58,7 @@ resource "aws_lambda_function" "upload_lambda" {
   environment {
     variables = {
       ENVIRONMENT = var.environment
-      BUCKET_NAME = var.upload_bucket_name
+      BUCKET_NAME = aws_s3_bucket.images_bucket.id
     }
   }
 }
