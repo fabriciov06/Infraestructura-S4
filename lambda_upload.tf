@@ -6,7 +6,6 @@ data "archive_file" "upload_lambda_zip" {
 
 resource "aws_iam_role" "upload_lambda_role" {
   name = "image-processor-${var.environment}-upload-lambda-role"
-
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -26,9 +25,14 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+# NUEVO: PERMISO PARA EJECUTARSE DENTRO DE LA VPC
+resource "aws_iam_role_policy_attachment" "upload_lambda_vpc_access" {
+  role       = aws_iam_role.upload_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
 resource "aws_iam_policy" "upload_lambda_s3_policy" {
   name = "image-processor-${var.environment}-upload-lambda-s3-policy"
-
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -61,4 +65,14 @@ resource "aws_lambda_function" "upload_lambda" {
       BUCKET_NAME = aws_s3_bucket.images_bucket.id
     }
   }
+
+  # CONFIGURACIÓN DE RED (VPC)
+  vpc_config {
+    subnet_ids         = [aws_subnet.priv_a.id, aws_subnet.priv_b.id]
+    security_group_ids = [aws_security_group.lambda_sg.id]
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.upload_lambda_vpc_access
+  ]
 }
